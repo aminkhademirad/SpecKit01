@@ -10,9 +10,9 @@ description: "Taskهای اجرایی نسخهٔ اولیهٔ مدیریت در�
 [Research](research.md)، [مدل داده](data-model.md)، [قرارداد HTTP](contracts/http-api.md)،
 [OpenAPI](contracts/openapi.json)، [راهنمای اعتبارسنجی](quickstart.md) و [ماتریس پذیرش](validation.md).
 
-**وضعیت**: فازهای اول تا سوم در T001 تا T032 با شواهد واقعی تکمیل شدند؛
-[گزارش آماده‌سازی](evidence/setup.md)، [گزارش زیرساخت](evidence/foundation.md) و [گزارش داستان اول](evidence/us1.md) نتایج اجرا را ثبت می‌کنند.
-T033 تا T064 انجام‌نشده‌اند؛ آغاز فاز چهارم و هر فاز بعدی به تأیید صریح کاربر وابسته است.
+**وضعیت**: فازهای اول تا چهارم در T001 تا T037 با شواهد واقعی تکمیل شدند؛
+[گزارش آماده‌سازی](evidence/setup.md)، [گزارش زیرساخت](evidence/foundation.md)، [گزارش داستان اول](evidence/us1.md) و [گزارش داستان دوم](evidence/us2.md) نتایج اجرا را ثبت می‌کنند.
+T038 تا T064 انجام‌نشده‌اند؛ آغاز فاز پنجم و هر فاز بعدی به تأیید صریح کاربر وابسته است.
 
 **آزمون‌ها**: کاربر و قانون اساسی و Specification آزمون خودکار قواعد حیاتی، امنیت و Concurrency را الزام کرده‌اند؛
 به همین دلیل Task آزمون برای هر داستان و زیرساخت وجود دارد.
@@ -106,13 +106,13 @@ ORM، Login، مدیریت حساب، Endpoint نقش، حذف، لغو، Idempo
 
 ### آزمون‌های داستان ۲
 
-- [ ] T033 [P] [US2] نوشتن آزمون مستقل Submit از Draft با fixture، مجوز جاری، مالک/غیرمالک، حالت نامعتبر و تکرار در PendingReview؛ Approved و PendingReview قابل ویرایش نباشند و اولویت وضعیت نامعتبر بر نسخهٔ قدیمی مالک ثابت شود. مسیرها: `test/unit/us2-submit.spec.ts`؛ پیش‌نیاز: T032؛ ردیابی: FR-005، FR-006، FR-011، FR-012، FR-013، AC-201، AC-202، AC-203، AC-204، AC-205؛
-- [ ] T034 [P] [US2] نوشتن آزمون قرارداد و HTTP Submit پیش از اتصال Endpoint: 204 بدون Body/ETag، If-Match، 409 تکرار مالک، 401/403/404 مطابق visibility و نبود عملیات لغو؛ هر شش AC-201 تا AC-206 با دادهٔ آماده پوشش یابد. مسیرها: `test/integration/us2-submit-http.spec.ts`؛ پیش‌نیاز: T032؛ ردیابی: FR-005، FR-006، FR-011، FR-012، FR-013، FR-021، FR-023، AC-201، AC-202، AC-203، AC-204، AC-205، AC-206؛
+- [X] T033 [P] [US2] نوشتن آزمون مستقل Submit از Draft با fixture، مجوز جاری، مالک/غیرمالک، حالت نامعتبر و تکرار در PendingReview؛ Approved و PendingReview قابل ویرایش نباشند و اولویت وضعیت نامعتبر بر نسخهٔ قدیمی مالک ثابت شود. مسیرها: `test/unit/us2-submit.spec.ts`؛ پیش‌نیاز: T032؛ ردیابی: FR-005، FR-006، FR-011، FR-012، FR-013، AC-201، AC-202، AC-203، AC-204، AC-205؛
+- [X] T034 [P] [US2] نوشتن آزمون قرارداد و HTTP Submit پیش از اتصال Endpoint: 204 بدون Body/ETag، If-Match، 409 تکرار مالک، 401/403/404 مطابق visibility و نبود عملیات لغو؛ هر شش AC-201 تا AC-206 با دادهٔ آماده پوشش یابد. مسیرها: `test/integration/us2-submit-http.spec.ts`؛ پیش‌نیاز: T032؛ ردیابی: FR-005، FR-006، FR-011، FR-012، FR-013، FR-021، FR-023، AC-201، AC-202، AC-203، AC-204، AC-205، AC-206؛
 ### پیاده‌سازی و یکپارچه‌سازی داستان 2
 
-- [ ] T035 [US2] ساخت کاربرد Submit برای Draft متعلق به Requester فعلی؛ بازخوانی نقش و درخواست در IMMEDIATE، بررسی ترتیب visibility/مجوز/وضعیت/نسخه، تغییر فقط status و version به PendingReview و Commit؛ عدم موفقیت یا تکرار، داده را تغییر ندهد؛ ChangesRequested در US4 افزوده می‌شود. مسیرها: `src/application/submit-change-request.ts`؛ پیش‌نیاز: T033، T034؛ ردیابی: FR-005، FR-012، FR-013، FR-015، FR-016، FR-018، AC-201، AC-202، AC-204، AC-205؛
-- [ ] T036 [US2] اتصال مسیر Submit به کاربرد T035؛ بدنه فقط غایب یا شیء خالی باشد، تغییر وضعیت از DTO پذیرفته نشود، 204 بدون اطلاعات درخواست برگردد و مسیر لغو ساخته نشود؛ تغییر app.module پس از T031 انجام شود. مسیرها: `src/http/controllers/submit-change-request.controller.ts`، `src/app.module.ts`؛ پیش‌نیاز: T035؛ ردیابی: FR-005، FR-013، FR-021، FR-027، AC-201، AC-205، AC-206؛
-- [ ] T037 [US2] اجرای آزمون‌های US2 با fixture مستقل از ایجاد HTTP و ثبت شواهد Submit و تکرار و عدم تغییر در رد؛ آزمون ویرایش ممنوع از US1 را نیز با حالت‌های آماده بررسی کنید و خروجی واقعی ثبت شود. مسیرها: `specs/001-change-request-management/evidence/us2.md`؛ پیش‌نیاز: T036؛ ردیابی: FR-005، FR-006، FR-011، FR-012، FR-013، FR-021، AC-201، AC-202، AC-203، AC-204، AC-205، AC-206؛
+- [X] T035 [US2] ساخت کاربرد Submit برای Draft متعلق به Requester فعلی؛ بازخوانی نقش و درخواست در IMMEDIATE، بررسی ترتیب visibility/مجوز/وضعیت/نسخه، تغییر فقط status و version به PendingReview و Commit؛ عدم موفقیت یا تکرار، داده را تغییر ندهد؛ ChangesRequested در US4 افزوده می‌شود. مسیرها: `src/application/submit-change-request.ts`؛ پیش‌نیاز: T033، T034؛ ردیابی: FR-005، FR-012، FR-013، FR-015، FR-016، FR-018، AC-201، AC-202، AC-204، AC-205؛
+- [X] T036 [US2] اتصال مسیر Submit به کاربرد T035؛ بدنه فقط غایب یا شیء خالی باشد، تغییر وضعیت از DTO پذیرفته نشود، 204 بدون اطلاعات درخواست برگردد و مسیر لغو ساخته نشود؛ تغییر app.module پس از T031 انجام شود. مسیرها: `src/http/controllers/submit-change-request.controller.ts`، `src/app.module.ts`؛ پیش‌نیاز: T035؛ ردیابی: FR-005، FR-013، FR-021، FR-027، AC-201، AC-205، AC-206؛
+- [X] T037 [US2] اجرای آزمون‌های US2 با fixture مستقل از ایجاد HTTP و ثبت شواهد Submit و تکرار و عدم تغییر در رد؛ آزمون ویرایش ممنوع از US1 را نیز با حالت‌های آماده بررسی کنید و خروجی واقعی ثبت شود. مسیرها: `specs/001-change-request-management/evidence/us2.md`؛ پیش‌نیاز: T036؛ ردیابی: FR-005، FR-006، FR-011، FR-012، FR-013، FR-021، AC-201، AC-202، AC-203، AC-204، AC-205، AC-206؛
 
 **دروازه**: شش سناریوی US2 و عدم رگرسیون منع ویرایش تأیید اجرایی داشته باشند.
 
