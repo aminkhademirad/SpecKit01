@@ -10,8 +10,9 @@ description: "Taskهای اجرایی نسخهٔ اولیهٔ مدیریت در�
 [Research](research.md)، [مدل داده](data-model.md)، [قرارداد HTTP](contracts/http-api.md)،
 [OpenAPI](contracts/openapi.json)، [راهنمای اعتبارسنجی](quickstart.md) و [ماتریس پذیرش](validation.md).
 
-**وضعیت**: فقط برنامهٔ اجرای آینده است؛ همهٔ Taskها انجام‌نشده‌اند. در تولید این فایل، کد، Migration،
-بسته یا تست اجرایی ایجاد یا اجرا نشده است. مسیرهای کد در ردیف‌ها مقصد کار آینده‌اند.
+**وضعیت**: فاز اول، آماده‌سازی مشترک، در T001 تا T005 با شواهد واقعی تکمیل شد؛
+[گزارش اجرا](evidence/setup.md) نتیجهٔ نصب، Build و آزمون‌های Setup را ثبت می‌کند.
+T006 تا T064 انجام‌نشده‌اند؛ آغاز فاز دوم و هر فاز بعدی به تأیید صریح کاربر وابسته است.
 
 **آزمون‌ها**: کاربر و قانون اساسی و Specification آزمون خودکار قواعد حیاتی، امنیت و Concurrency را الزام کرده‌اند؛
 به همین دلیل Task آزمون برای هر داستان و زیرساخت وجود دارد.
@@ -21,7 +22,7 @@ US1 به‌تنهایی فقط نخستین برش مستقل برای نمای�
 
 ## قالب و معنای نشانه‌ها
 
-- هر Task دارای چک‌باکس انجام‌نشده، شناسهٔ یکتا، مسیر فایل و پیش‌نیاز مستقیم است.
+- هر Task دارای چک‌باکس وضعیت، شناسهٔ یکتا، مسیر فایل و پیش‌نیاز مستقیم است.
 - [P] یعنی پس از تکمیل همهٔ پیش‌نیازهای آن ردیف، می‌توان آن را با Task آمادهٔ دیگری که فایل مشترک ندارد انجام داد.
 - [US1] تا [US5] فقط در مراحل داستان‌ها می‌آیند؛ آماده‌سازی، زیرساخت و مرحلهٔ نهایی برچسب داستان ندارند.
 - پیش‌نیازهای مستقیم در هر ردیف نوشته شده‌اند؛ وابستگی‌های غیرمستقیم از همان زنجیره به‌دست می‌آیند.
@@ -29,7 +30,7 @@ US1 به‌تنهایی فقط نخستین برش مستقل برای نمای�
   با ترتیب وابستگی‌ها کنترل شده است؛ یکسان‌بودن اولویت به معنی مجازبودن ویرایش هم‌زمان این فایل‌ها نیست.
 - آزمون‌ها پیش از تکمیل رفتار نوشته شوند. در Task پیاده‌سازی، پس از اسکلت importپذیر و پیش از منطق جدید،
   شکست رفتاری آزمون مرتبط ثبت شود؛ خطای نصب یا import جای شکست assertion نیست. آزمون بخش موجود می‌تواند سبز بماند.
-- شواهد داخل evidence/ فقط در اجرای آینده و بر مبنای فرمان واقعی ساخته می‌شوند؛ هیچ ردیفی صرفاً با استناد به این فهرست تأیید نمی‌شود.
+- شواهد داخل evidence/ فقط بر مبنای فرمان واقعی ساخته می‌شوند؛ هیچ ردیفی صرفاً با استناد به این فهرست تأیید نمی‌شود.
 
 ## قرارداد مسیرها
 
@@ -42,11 +43,11 @@ ORM، Login، مدیریت حساب، Endpoint نقش، حذف، لغو، Idempo
 
 **هدف**: اسکلت و ابزارهای مصوب، پیکربندی محلی و امکان آزمون واقعی Native Driver؛ پیش‌نیاز مراحل بعدی است.
 
-- [ ] T001 راه‌اندازی اسکلت تک‌برنامهٔ NestJS 12 با TypeScript 6، Node.js 24 LTS با حداقل 24.15، CommonJS، Express و وابستگی‌های مصوب؛ نسخه‌های سازگار را در lockfile تثبیت و ساختار src/ و test/ و migrations/ و tools/ را ایجاد کنید؛ هیچ قابلیت خارج از Scope اضافه نشود. مسیرها: `package.json`، `package-lock.json`، `tsconfig.json`، `nest-cli.json`، `src/main.ts`، `src/app.module.ts`؛ پیش‌نیاز: ندارد؛ مبنا: Plan/Research و اصول قانون اساسی؛
-- [ ] T002 [P] پیکربندی Jest 30، @nestjs/testing و Supertest و مجموعه‌های Unit، Integration، Concurrency و Contract؛ تمام نام‌های npm scripts راهنمای quickstart را از ابتدا به مسیرهای معلوم نگاشت و گزارش آزمون را قابل ذخیره کنید. مسیرها: `jest.config.cjs`، `jest.integration.config.cjs`، `jest.concurrency.config.cjs`، `jest.contract.config.cjs`، `package.json`؛ پیش‌نیاز: T001؛ مبنا: Plan/Research و اصول قانون اساسی؛
-- [ ] T003 [P] تعریف تنظیمات NODE_ENV، PORT، DATABASE_PATH، JWT_ISSUER، JWT_AUDIENCE و JWT_SECRET با خطای پیکربندی صریح؛ کلید واقعی و Database و شواهد حساس را از Git خارج کنید؛ حالت محلی برای production بدون تنظیم مستقل فعال نشود. مسیرها: `src/infrastructure/configuration.ts`، `.env.example`، `.gitignore`؛ پیش‌نیاز: T001؛ مبنا: Plan/Research و اصول قانون اساسی؛
-- [ ] T004 [P] ایجاد ابزار dev:init برای کلید تصادفی محلی خارج از مخزن و تنظیم issuer برابر changeflow-dev و audience برابر changeflow-api؛ کلید موجود خودکار بازنویسی و در خروجی عمومی چاپ نشود. مسیرها: `tools/dev-init.ts`؛ پیش‌نیاز: T003؛ ردیابی: FR-012، AC-116؛
-- [ ] T005 بررسی واقعی نصب وابستگی‌های قفل‌شده و بارگذاری Native Driver better-sqlite3 با فایل موقت؛ نسخهٔ Node/npm/Native SQLite و خطای احتمالی نصب را ثبت کنید؛ موفقیت فرضی و نصب ORM جایگزین مجاز نیست. مسیرها: `test/integration/native-driver.spec.ts`، `specs/001-change-request-management/evidence/setup.md`؛ پیش‌نیاز: T002، T003، T004؛ مبنا: Plan/Research و اصول قانون اساسی؛
+- [X] T001 راه‌اندازی اسکلت تک‌برنامهٔ NestJS 12 با TypeScript 6، Node.js 24 LTS با حداقل 24.15، CommonJS، Express و وابستگی‌های مصوب؛ نسخه‌های سازگار را در lockfile تثبیت و ساختار src/ و test/ و migrations/ و tools/ را ایجاد کنید؛ هیچ قابلیت خارج از Scope اضافه نشود. مسیرها: `package.json`، `package-lock.json`، `tsconfig.json`، `nest-cli.json`، `src/main.ts`، `src/app.module.ts`؛ پیش‌نیاز: ندارد؛ مبنا: Plan/Research و اصول قانون اساسی؛
+- [X] T002 [P] پیکربندی Jest 30، @nestjs/testing و Supertest و مجموعه‌های Unit، Integration، Concurrency و Contract؛ تمام نام‌های npm scripts راهنمای quickstart را از ابتدا به مسیرهای معلوم نگاشت و گزارش آزمون را قابل ذخیره کنید. مسیرها: `jest.config.cjs`، `jest.integration.config.cjs`، `jest.concurrency.config.cjs`، `jest.contract.config.cjs`، `package.json`؛ پیش‌نیاز: T001؛ مبنا: Plan/Research و اصول قانون اساسی؛
+- [X] T003 [P] تعریف تنظیمات NODE_ENV، PORT، DATABASE_PATH، JWT_ISSUER، JWT_AUDIENCE و JWT_SECRET با خطای پیکربندی صریح؛ کلید واقعی و Database و شواهد حساس را از Git خارج کنید؛ حالت محلی برای production بدون تنظیم مستقل فعال نشود. مسیرها: `src/infrastructure/configuration.ts`، `.env.example`، `.gitignore`؛ پیش‌نیاز: T001؛ مبنا: Plan/Research و اصول قانون اساسی؛
+- [X] T004 [P] ایجاد ابزار dev:init برای کلید تصادفی محلی خارج از مخزن و تنظیم issuer برابر changeflow-dev و audience برابر changeflow-api؛ کلید موجود خودکار بازنویسی و در خروجی عمومی چاپ نشود. مسیرها: `tools/dev-init.ts`؛ پیش‌نیاز: T003؛ ردیابی: FR-012، AC-116؛
+- [X] T005 بررسی واقعی نصب وابستگی‌های قفل‌شده و بارگذاری Native Driver better-sqlite3 با فایل موقت؛ نسخهٔ Node/npm/Native SQLite و خطای احتمالی نصب را ثبت کنید؛ موفقیت فرضی و نصب ORM جایگزین مجاز نیست. مسیرها: `test/integration/native-driver.spec.ts`، `specs/001-change-request-management/evidence/setup.md`؛ پیش‌نیاز: T002، T003، T004؛ مبنا: Plan/Research و اصول قانون اساسی؛
 
 **دروازه**: T001 تا T005 تکمیل و نصب/بارگذاری Driver با شواهد واقعی قابل بررسی باشد.
 

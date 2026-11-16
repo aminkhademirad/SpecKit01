@@ -1,0 +1,52 @@
+{
+  "name": "changeflow",
+  "version": "0.1.0",
+  "private": true,
+  "description": "سامانهٔ مدیریت درخواست تغییر؛ نسخهٔ اولیه",
+  "type": "commonjs",
+  "engines": { "node": ">=24.15.0 <25", "npm": ">=11.16.0" },
+  "packageManager": "npm@11.16.0",
+  "allowScripts": {
+    "better-sqlite3@13.2.0": false,
+    "@parcel/watcher@2.6.0": true,
+    "esbuild@0.28.2": true
+  },
+  "scripts": {
+    "build": "nest build",
+    "start": "node dist/main.js",
+    "start:dev": "nest start --watch",
+    "typecheck": "tsc --project tsconfig.test.json --noEmit",
+    "test": "npm run test:unit && npm run test:integration",
+    "test:unit": "node --experimental-vm-modules node_modules/jest/bin/jest.js --config jest.config.cjs --runInBand",
+    "test:integration": "node --experimental-vm-modules node_modules/jest/bin/jest.js --config jest.integration.config.cjs --runInBand",
+    "test:concurrency": "node --experimental-vm-modules node_modules/jest/bin/jest.js --config jest.concurrency.config.cjs --runInBand",
+    "test:contract": "node --experimental-vm-modules node_modules/jest/bin/jest.js --config jest.contract.config.cjs --runInBand",
+    "dev:init": "tsx tools/dev-init.ts",
+    "db:migrate": "tsx tools/migrate.ts",
+    "dev:seed": "tsx tools/dev-seed.ts",
+    "dev:token": "tsx tools/dev-token.ts",
+    "dev:permissions": "tsx tools/dev-permissions.ts"
+  },
+  "dependencies": {
+    "@nestjs/common": "12.5.0",
+    "@nestjs/core": "12.5.0",
+    "@nestjs/jwt": "12.0.5",
+    "@nestjs/platform-express": "12.5.0",
+    "better-sqlite3": "13.2.0",
+    "reflect-metadata": "0.2.2",
+    "rxjs": "7.8.2"
+  },
+  "devDependencies": {
+    "@nestjs/cli": "12.0.13",
+    "@nestjs/testing": "12.5.0",
+    "@types/better-sqlite3": "9.6.0",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^24.0.0",
+    "@types/supertest": "^6.0.0",
+    "jest": "30.5.2",
+    "supertest": "7.3.2",
+    "ts-jest": "29.4.15",
+    "tsx": "4.23.15",
+    "typescript": "6.0.3"
+  }
+}
