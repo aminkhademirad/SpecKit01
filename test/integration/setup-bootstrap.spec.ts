@@ -1,17 +1,13 @@
-import 'reflect-metadata';
-import { Test } from '@nestjs/testing';
 import request from 'supertest';
-import { AppModule } from '../../src/app.module';
+import { createTestApp } from '../fixtures/create-test-app';
 
 describe('اسکلت HTTP بدون قابلیت محصول', () => {
   it('با adapter واقعی راه‌اندازی می‌شود و مسیر محصول هنوز وجود ندارد', async () => {
-    const moduleRef = await Test.createTestingModule({ imports: [AppModule] }).compile();
-    const app = moduleRef.createNestApplication({ bodyParser: false, logger: false });
+    const context = await createTestApp();
     try {
-      await app.init();
-      await request(app.getHttpServer()).get('/api/change-requests').expect(404);
+      await request(context.app.getHttpServer()).get('/api/change-requests').expect(404);
     } finally {
-      await app.close();
+      await context.close();
     }
   });
 });
