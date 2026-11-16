@@ -1,0 +1,914 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "قرارداد API مدیریت درخواست تغییر ChangeFlow",
+    "version": "1.0.0",
+    "description": "خروجی طراحی Plan؛ وجود پیاده‌سازی یا اجرای آزمون ادعا نمی‌شود. قرارداد تکمیلی http-api.md و ترتیب محرمانگی و Unicode آن الزام‌آورند."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000",
+      "description": "نشانی برنامه‌ریزی‌شده برای اجرای محلی آینده؛ در این مرحله سرویسی راه‌اندازی نشده است."
+    }
+  ],
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "tags": [
+    {
+      "name": "change-requests",
+      "description": "عملیات مصوب درخواست تغییر"
+    }
+  ],
+  "paths": {
+    "/api/change-requests": {
+      "post": {
+        "tags": [
+          "change-requests"
+        ],
+        "operationId": "createChangeRequest",
+        "summary": "ایجاد پیش‌نویس",
+        "description": "Requester فعلی؛ مالک از هویت معتبر و وضعیت Draft از سامانه تعیین می‌شوند. تکرار معتبر، درخواست مستقلی می‌سازد.",
+        "requestBody": {
+          "required": true,
+          "description": "فقط سه مقدار محتوایی؛ سایر خصوصیت‌ها از جمله requesterId و status باعث رد کل عملیات‌اند.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WriteChangeRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "$ref": "#/components/responses/Response201_1"
+          },
+          "400": {
+            "$ref": "#/components/responses/Response400_2"
+          },
+          "401": {
+            "$ref": "#/components/responses/Response401_3"
+          },
+          "403": {
+            "$ref": "#/components/responses/Response403_4"
+          },
+          "500": {
+            "$ref": "#/components/responses/Response500_5"
+          },
+          "503": {
+            "$ref": "#/components/responses/Response503_6"
+          }
+        }
+      }
+    },
+    "/api/change-requests/{id}": {
+      "get": {
+        "tags": [
+          "change-requests"
+        ],
+        "operationId": "getChangeRequest",
+        "summary": "مشاهدهٔ درخواست مجاز",
+        "description": "مالک در همهٔ وضعیت‌ها و Reviewer برای درخواست دیگران فقط در PendingReview؛ پاسخ منبع پنهان و ناموجود یکسان است.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "شناسهٔ UUID درخواست؛ برای شناسهٔ ناموجود، نامعتبر یا خارج از دسترسی، پاسخ عمومی 404 است.",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/Response200_7"
+          },
+          "400": {
+            "$ref": "#/components/responses/Response400_2"
+          },
+          "401": {
+            "$ref": "#/components/responses/Response401_3"
+          },
+          "404": {
+            "$ref": "#/components/responses/Response404_8"
+          },
+          "500": {
+            "$ref": "#/components/responses/Response500_5"
+          },
+          "503": {
+            "$ref": "#/components/responses/Response503_6"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "change-requests"
+        ],
+        "operationId": "updateChangeRequest",
+        "summary": "جایگزینی محتوای درخواست",
+        "description": "هر سه مقدار لازم‌اند؛ فقط مالک دارای مجوز Requester در Draft یا ChangesRequested. نوشتن مشروط به نسخهٔ مشاهده‌شده و تراکنش است.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "شناسهٔ UUID درخواست؛ برای شناسهٔ ناموجود، نامعتبر یا خارج از دسترسی، پاسخ عمومی 404 است.",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "If-Match",
+            "in": "header",
+            "required": true,
+            "description": "یک ETag قوی از آخرین نمایش مشاهده‌شده؛ wildcard، چند مقدار و نسخهٔ ضعیف مجاز نیستند. تقدم بررسی‌ها در http-api.md الزام‌آور است.",
+            "schema": {
+              "type": "string",
+              "pattern": "^\"cf-[0-9a-f-]{36}-[0-9a-f-]{36}\"$"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "description": "فقط سه مقدار محتوایی؛ سایر خصوصیت‌ها از جمله requesterId و status باعث رد کل عملیات‌اند.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WriteChangeRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/Response200_7"
+          },
+          "400": {
+            "$ref": "#/components/responses/Response400_2"
+          },
+          "401": {
+            "$ref": "#/components/responses/Response401_3"
+          },
+          "403": {
+            "$ref": "#/components/responses/Response403_4"
+          },
+          "404": {
+            "$ref": "#/components/responses/Response404_8"
+          },
+          "409": {
+            "$ref": "#/components/responses/Response409_9"
+          },
+          "412": {
+            "$ref": "#/components/responses/Response412_10"
+          },
+          "428": {
+            "$ref": "#/components/responses/Response428_11"
+          },
+          "500": {
+            "$ref": "#/components/responses/Response500_5"
+          },
+          "503": {
+            "$ref": "#/components/responses/Response503_6"
+          }
+        }
+      }
+    },
+    "/api/change-requests/{id}/submit": {
+      "post": {
+        "tags": [
+          "change-requests"
+        ],
+        "operationId": "submitChangeRequest",
+        "summary": "ارسال برای بررسی",
+        "description": "مالک دارای مجوز Requester؛ Draft یا ChangesRequested به PendingReview. تکرار روی PendingReview برای مالک وضعیت نامعتبر است.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "شناسهٔ UUID درخواست؛ برای شناسهٔ ناموجود، نامعتبر یا خارج از دسترسی، پاسخ عمومی 404 است.",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "If-Match",
+            "in": "header",
+            "required": true,
+            "description": "یک ETag قوی از آخرین نمایش مشاهده‌شده؛ wildcard، چند مقدار و نسخهٔ ضعیف مجاز نیستند. تقدم بررسی‌ها در http-api.md الزام‌آور است.",
+            "schema": {
+              "type": "string",
+              "pattern": "^\"cf-[0-9a-f-]{36}-[0-9a-f-]{36}\"$"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "description": "بدون بدنه یا شیء JSON خالی؛ هر خصوصیت اضافی نامعتبر است.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmptyAction"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "$ref": "#/components/responses/Response204_12"
+          },
+          "400": {
+            "$ref": "#/components/responses/Response400_2"
+          },
+          "401": {
+            "$ref": "#/components/responses/Response401_3"
+          },
+          "403": {
+            "$ref": "#/components/responses/Response403_4"
+          },
+          "404": {
+            "$ref": "#/components/responses/Response404_8"
+          },
+          "409": {
+            "$ref": "#/components/responses/Response409_9"
+          },
+          "412": {
+            "$ref": "#/components/responses/Response412_10"
+          },
+          "428": {
+            "$ref": "#/components/responses/Response428_11"
+          },
+          "500": {
+            "$ref": "#/components/responses/Response500_5"
+          },
+          "503": {
+            "$ref": "#/components/responses/Response503_6"
+          }
+        }
+      }
+    },
+    "/api/change-requests/{id}/approve": {
+      "post": {
+        "tags": [
+          "change-requests"
+        ],
+        "operationId": "approveChangeRequest",
+        "summary": "تأیید درخواست شخص دیگر",
+        "description": "Reviewer فعلی و غیرمالک؛ فقط PendingReview به Approved. پس از موفقیت، GET درخواست دیگران دیگر مجاز نیست.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "شناسهٔ UUID درخواست؛ برای شناسهٔ ناموجود، نامعتبر یا خارج از دسترسی، پاسخ عمومی 404 است.",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "If-Match",
+            "in": "header",
+            "required": true,
+            "description": "یک ETag قوی از آخرین نمایش مشاهده‌شده؛ wildcard، چند مقدار و نسخهٔ ضعیف مجاز نیستند. تقدم بررسی‌ها در http-api.md الزام‌آور است.",
+            "schema": {
+              "type": "string",
+              "pattern": "^\"cf-[0-9a-f-]{36}-[0-9a-f-]{36}\"$"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "description": "بدون بدنه یا شیء JSON خالی؛ هر خصوصیت اضافی نامعتبر است.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmptyAction"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "$ref": "#/components/responses/Response204_12"
+          },
+          "400": {
+            "$ref": "#/components/responses/Response400_2"
+          },
+          "401": {
+            "$ref": "#/components/responses/Response401_3"
+          },
+          "403": {
+            "$ref": "#/components/responses/Response403_4"
+          },
+          "404": {
+            "$ref": "#/components/responses/Response404_8"
+          },
+          "409": {
+            "$ref": "#/components/responses/Response409_9"
+          },
+          "412": {
+            "$ref": "#/components/responses/Response412_10"
+          },
+          "428": {
+            "$ref": "#/components/responses/Response428_11"
+          },
+          "500": {
+            "$ref": "#/components/responses/Response500_5"
+          },
+          "503": {
+            "$ref": "#/components/responses/Response503_6"
+          }
+        }
+      }
+    },
+    "/api/change-requests/{id}/request-changes": {
+      "post": {
+        "tags": [
+          "change-requests"
+        ],
+        "operationId": "requestChanges",
+        "summary": "برگشت درخواست شخص دیگر برای اصلاح",
+        "description": "Reviewer فعلی و غیرمالک؛ فقط PendingReview به ChangesRequested. درخواست خود حتی با دو نقش قابل برگشت نیست.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "شناسهٔ UUID درخواست؛ برای شناسهٔ ناموجود، نامعتبر یا خارج از دسترسی، پاسخ عمومی 404 است.",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "If-Match",
+            "in": "header",
+            "required": true,
+            "description": "یک ETag قوی از آخرین نمایش مشاهده‌شده؛ wildcard، چند مقدار و نسخهٔ ضعیف مجاز نیستند. تقدم بررسی‌ها در http-api.md الزام‌آور است.",
+            "schema": {
+              "type": "string",
+              "pattern": "^\"cf-[0-9a-f-]{36}-[0-9a-f-]{36}\"$"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "description": "بدون بدنه یا شیء JSON خالی؛ هر خصوصیت اضافی نامعتبر است.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmptyAction"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "$ref": "#/components/responses/Response204_12"
+          },
+          "400": {
+            "$ref": "#/components/responses/Response400_2"
+          },
+          "401": {
+            "$ref": "#/components/responses/Response401_3"
+          },
+          "403": {
+            "$ref": "#/components/responses/Response403_4"
+          },
+          "404": {
+            "$ref": "#/components/responses/Response404_8"
+          },
+          "409": {
+            "$ref": "#/components/responses/Response409_9"
+          },
+          "412": {
+            "$ref": "#/components/responses/Response412_10"
+          },
+          "428": {
+            "$ref": "#/components/responses/Response428_11"
+          },
+          "500": {
+            "$ref": "#/components/responses/Response500_5"
+          },
+          "503": {
+            "$ref": "#/components/responses/Response503_6"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "توکن امضاشدهٔ محلی Development/Test با issuer و audience مشخص؛ مجوز فعلی از SQLite خوانده می‌شود."
+      }
+    },
+    "schemas": {
+      "WriteChangeRequest": {
+        "type": "object",
+        "description": "متن سادهٔ well-formed Unicode؛ حدود پس از trim و بر حسب scalar سنجیده می‌شوند. تبدیل خودکار نوع و حذف بی‌صدای خصوصیت اضافی مجاز نیست.",
+        "additionalProperties": false,
+        "required": [
+          "title",
+          "description",
+          "reason"
+        ],
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200,
+            "description": "عنوان؛ پس از حذف فاصله‌های ابتدا و انتها، مقدار غیرخالی لازم است."
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 5000,
+            "description": "شرح تغییر؛ متن ساده و بدون تفسیر HTML یا Markdown."
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000,
+            "description": "دلیل تغییر؛ فارسی، لاتین، نیم‌فاصله و ایموجی مجازند."
+          }
+        }
+      },
+      "ChangeRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "title",
+          "description",
+          "reason",
+          "requesterId",
+          "status"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "شناسهٔ سامانه"
+          },
+          "title": {
+            "type": "string",
+            "description": "عنوان ثبت‌شده پس از trim"
+          },
+          "description": {
+            "type": "string",
+            "description": "شرح ثبت‌شده"
+          },
+          "reason": {
+            "type": "string",
+            "description": "دلیل ثبت‌شده"
+          },
+          "requesterId": {
+            "type": "string",
+            "format": "uuid",
+            "readOnly": true,
+            "description": "شناسهٔ ثبت‌کننده؛ در ورودی ممنوع است."
+          },
+          "status": {
+            "type": "string",
+            "readOnly": true,
+            "enum": [
+              "Draft",
+              "PendingReview",
+              "ChangesRequested",
+              "Approved"
+            ],
+            "description": "وضعیت تحت کنترل گردش کار؛ در ورودی محتوایی ممنوع است."
+          }
+        }
+      },
+      "EmptyAction": {
+        "type": "object",
+        "additionalProperties": false,
+        "maxProperties": 0,
+        "description": "شیء خالی؛ دلیل بررسی یا تغییر فیلدها جزو این عملیات نیست."
+      },
+      "FieldError": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "field",
+          "reason"
+        ],
+        "properties": {
+          "field": {
+            "type": "string",
+            "description": "نام فنی فیلد یا پیش‌شرط"
+          },
+          "reason": {
+            "type": "string",
+            "description": "علت کوتاه فارسی"
+          }
+        }
+      },
+      "ApiError": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "code",
+          "category",
+          "message"
+        ],
+        "properties": {
+          "code": {
+            "type": "string",
+            "enum": [
+              "UNAUTHENTICATED",
+              "REQUEST_UNAVAILABLE",
+              "FORBIDDEN",
+              "INVALID_INPUT",
+              "INVALID_STATE",
+              "CONCURRENCY_CONFLICT",
+              "VERSION_REQUIRED",
+              "SERVICE_UNAVAILABLE",
+              "INTERNAL_ERROR"
+            ],
+            "description": "شناسهٔ فنی خطا"
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "هویت نامعتبر",
+              "درخواست در دسترس نیست",
+              "مجوز ناکافی برای درخواست قابل مشاهده",
+              "ورودی نامعتبر",
+              "وضعیت نامعتبر",
+              "تعارض هم‌زمان",
+              "خطای فنی"
+            ],
+            "description": "دستهٔ فارسی؛ خطای فنی خارج از دسته‌های کسب‌وکار است."
+          },
+          "message": {
+            "type": "string",
+            "description": "توضیح کوتاه فارسی بدون اطلاعات داخلی یا منبع پنهان"
+          },
+          "errors": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "$ref": "#/components/schemas/FieldError"
+            },
+            "description": "برای ورودی نامعتبر، نام فیلد و علت؛ در 404 وجود ندارد."
+          }
+        }
+      },
+      "InputError": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiError"
+          },
+          {
+            "required": [
+              "errors"
+            ]
+          }
+        ],
+        "description": "خطای ورودی یا پیش‌شرط غایب، همراه نام فیلد و علت فارسی."
+      },
+      "UnavailableError": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "code",
+          "category",
+          "message"
+        ],
+        "properties": {
+          "code": {
+            "const": "REQUEST_UNAVAILABLE"
+          },
+          "category": {
+            "const": "درخواست در دسترس نیست"
+          },
+          "message": {
+            "const": "درخواست در دسترس نیست."
+          }
+        },
+        "description": "پاسخ دقیقاً یکسان برای منبع ناموجود و خارج از دسترسی مشاهده؛ جزئیات منبع، نسخه و errors ندارد."
+      }
+    },
+    "responses": {
+      "Response201_1": {
+        "description": "درخواست در Draft ایجاد شد.",
+        "headers": {
+          "Cache-Control": {
+            "description": "پاسخ نباید ذخیرهٔ موقت شود.",
+            "schema": {
+              "type": "string",
+              "const": "no-store"
+            }
+          },
+          "ETag": {
+            "description": "نسخهٔ قوی و opaque برای درخواست قابل مشاهده؛ در If-Match بعدی ارسال شود.",
+            "schema": {
+              "type": "string",
+              "pattern": "^\"cf-[0-9a-f-]{36}-[0-9a-f-]{36}\"$"
+            }
+          },
+          "Location": {
+            "description": "مسیر درخواست ایجادشده.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ChangeRequest"
+            }
+          }
+        }
+      },
+      "Response400_2": {
+        "description": "ورودی نامعتبر؛ توضیح فارسی مطابق قرارداد HTTP ارائه می‌شود.",
+        "headers": {
+          "Cache-Control": {
+            "description": "پاسخ نباید ذخیرهٔ موقت شود.",
+            "schema": {
+              "type": "string",
+              "const": "no-store"
+            }
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/InputError"
+            },
+            "example": {
+              "code": "INVALID_INPUT",
+              "category": "ورودی نامعتبر",
+              "message": "اطلاعات ورودی معتبر نیست.",
+              "errors": [
+                {
+                  "field": "title",
+                  "reason": "عنوان نباید خالی باشد."
+                }
+              ]
+            }
+          }
+        }
+      },
+      "Response401_3": {
+        "description": "هویت نامعتبر؛ توضیح فارسی مطابق قرارداد HTTP ارائه می‌شود.",
+        "headers": {
+          "Cache-Control": {
+            "description": "پاسخ نباید ذخیرهٔ موقت شود.",
+            "schema": {
+              "type": "string",
+              "const": "no-store"
+            }
+          },
+          "WWW-Authenticate": {
+            "schema": {
+              "type": "string",
+              "const": "Bearer"
+            },
+            "description": "چالش احراز هویت"
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ApiError"
+            },
+            "example": {
+              "code": "UNAUTHENTICATED",
+              "category": "هویت نامعتبر",
+              "message": "احراز هویت معتبر لازم است."
+            }
+          }
+        }
+      },
+      "Response403_4": {
+        "description": "مجوز ناکافی برای درخواست قابل مشاهده؛ توضیح فارسی مطابق قرارداد HTTP ارائه می‌شود.",
+        "headers": {
+          "Cache-Control": {
+            "description": "پاسخ نباید ذخیرهٔ موقت شود.",
+            "schema": {
+              "type": "string",
+              "const": "no-store"
+            }
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ApiError"
+            },
+            "example": {
+              "code": "FORBIDDEN",
+              "category": "مجوز ناکافی برای درخواست قابل مشاهده",
+              "message": "انجام عملیات با خطا روبه‌رو شد."
+            }
+          }
+        }
+      },
+      "Response500_5": {
+        "description": "خطای فنی؛ توضیح فارسی مطابق قرارداد HTTP ارائه می‌شود.",
+        "headers": {
+          "Cache-Control": {
+            "description": "پاسخ نباید ذخیرهٔ موقت شود.",
+            "schema": {
+              "type": "string",
+              "const": "no-store"
+            }
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ApiError"
+            },
+            "example": {
+              "code": "INTERNAL_ERROR",
+              "category": "خطای فنی",
+              "message": "انجام عملیات با خطا روبه‌رو شد."
+            }
+          }
+        }
+      },
+      "Response503_6": {
+        "description": "خطای فنی؛ توضیح فارسی مطابق قرارداد HTTP ارائه می‌شود.",
+        "headers": {
+          "Cache-Control": {
+            "description": "پاسخ نباید ذخیرهٔ موقت شود.",
+            "schema": {
+              "type": "string",
+              "const": "no-store"
+            }
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ApiError"
+            },
+            "example": {
+              "code": "SERVICE_UNAVAILABLE",
+              "category": "خطای فنی",
+              "message": "انجام عملیات با خطا روبه‌رو شد."
+            }
+          }
+        }
+      },
+      "Response200_7": {
+        "description": "نمایش مجاز درخواست.",
+        "headers": {
+          "Cache-Control": {
+            "description": "پاسخ نباید ذخیرهٔ موقت شود.",
+            "schema": {
+              "type": "string",
+              "const": "no-store"
+            }
+          },
+          "ETag": {
+            "description": "نسخهٔ قوی و opaque برای درخواست قابل مشاهده؛ در If-Match بعدی ارسال شود.",
+            "schema": {
+              "type": "string",
+              "pattern": "^\"cf-[0-9a-f-]{36}-[0-9a-f-]{36}\"$"
+            }
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ChangeRequest"
+            }
+          }
+        }
+      },
+      "Response404_8": {
+        "description": "درخواست در دسترس نیست؛ توضیح فارسی مطابق قرارداد HTTP ارائه می‌شود.",
+        "headers": {
+          "Cache-Control": {
+            "description": "پاسخ نباید ذخیرهٔ موقت شود.",
+            "schema": {
+              "type": "string",
+              "const": "no-store"
+            }
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/UnavailableError"
+            },
+            "example": {
+              "code": "REQUEST_UNAVAILABLE",
+              "category": "درخواست در دسترس نیست",
+              "message": "درخواست در دسترس نیست."
+            }
+          }
+        }
+      },
+      "Response409_9": {
+        "description": "وضعیت نامعتبر؛ توضیح فارسی مطابق قرارداد HTTP ارائه می‌شود.",
+        "headers": {
+          "Cache-Control": {
+            "description": "پاسخ نباید ذخیرهٔ موقت شود.",
+            "schema": {
+              "type": "string",
+              "const": "no-store"
+            }
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ApiError"
+            },
+            "example": {
+              "code": "INVALID_STATE",
+              "category": "وضعیت نامعتبر",
+              "message": "انجام عملیات با خطا روبه‌رو شد."
+            }
+          }
+        }
+      },
+      "Response412_10": {
+        "description": "تعارض هم‌زمان؛ توضیح فارسی مطابق قرارداد HTTP ارائه می‌شود.",
+        "headers": {
+          "Cache-Control": {
+            "description": "پاسخ نباید ذخیرهٔ موقت شود.",
+            "schema": {
+              "type": "string",
+              "const": "no-store"
+            }
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ApiError"
+            },
+            "example": {
+              "code": "CONCURRENCY_CONFLICT",
+              "category": "تعارض هم‌زمان",
+              "message": "درخواست پس از مشاهدهٔ شما تغییر کرده است؛ دوباره آن را دریافت کنید."
+            }
+          }
+        }
+      },
+      "Response428_11": {
+        "description": "ورودی نامعتبر؛ توضیح فارسی مطابق قرارداد HTTP ارائه می‌شود.",
+        "headers": {
+          "Cache-Control": {
+            "description": "پاسخ نباید ذخیرهٔ موقت شود.",
+            "schema": {
+              "type": "string",
+              "const": "no-store"
+            }
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/InputError"
+            },
+            "example": {
+              "code": "VERSION_REQUIRED",
+              "category": "ورودی نامعتبر",
+              "message": "نسخهٔ مشاهده‌شده را در If-Match ارسال کنید.",
+              "errors": [
+                {
+                  "field": "If-Match",
+                  "reason": "این پیش‌شرط الزامی است."
+                }
+              ]
+            }
+          }
+        }
+      },
+      "Response204_12": {
+        "description": "عملیات نهایی شد؛ بدنه و ETag ارائه نمی‌شود و مجوز مشاهدهٔ تازه ایجاد نمی‌کند.",
+        "headers": {
+          "Cache-Control": {
+            "description": "پاسخ نباید ذخیرهٔ موقت شود.",
+            "schema": {
+              "type": "string",
+              "const": "no-store"
+            }
+          }
+        }
+      }
+    }
+  }
+}
