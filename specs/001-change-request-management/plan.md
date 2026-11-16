@@ -38,6 +38,8 @@ JWT محلی فقط هویت Development/Test را ثابت می‌کند؛ مج
 | Authentication | JWT امضاشدهٔ محلی با issuer، audience، exp و sub معتبر؛ کلید بیرون از مخزن و نقش فعلی در Database؛ بدون Login یا API مدیریت نقش. |
 | Concurrency | version فنی UUID، ETag قوی و If-Match؛ نوشتن مشروط؛ تراکنش مشترک مجوز و درخواست و Commit به‌عنوان نهایی‌شدن. |
 | متن | متن سادهٔ well-formed Unicode؛ شمارش scalar پس از trim؛ بدون تفسیر HTML/Markdown و بدون normalization زبانی. |
+| سقف فنی بدنه | تصمیم تکمیلی D-07: ۱۲۸ KiB برابر ۱۳۱۰۷۲ بایت هنگام دریافت؛ عبور از سقف پیش از parsing و Authentication/visibility با 413 عمومی رد می‌شود؛ برای بدنهٔ در محدوده، تقدم عادی بررسی‌ها برقرار است. |
+| هویت فاقد نگاشت محلی | تصمیم تکمیلی D-08: JWT معتبر بدون ردیف users فاقد مجوز محلی است؛ ایجاد 403 و عملیات وابسته به شناسه 404 عمومی؛ بدون provision خودکار و متمایز از خطای Database. |
 
 Node.js v24.18.0 و npm 11.16.0 در محیط فعلی مشاهده شدند؛ pnpm در PATH نبود.
 هیچ بسته‌ای نصب نشده است. وجود Runtime و سازگاری حداقل‌های مستند، به معنی موفقیت نصب Native Driver یا Build نیست.

@@ -30,10 +30,10 @@
         ],
         "operationId": "createChangeRequest",
         "summary": "ایجاد پیش‌نویس",
-        "description": "Requester فعلی؛ مالک از هویت معتبر و وضعیت Draft از سامانه تعیین می‌شوند. تکرار معتبر، درخواست مستقلی می‌سازد.",
+        "description": "Requester فعلی؛ مالک از هویت معتبر و وضعیت Draft از سامانه تعیین می‌شوند. تکرار معتبر، درخواست مستقلی می‌سازد. JWT معتبر بدون نگاشت محلی مجوز ایجاد ندارد و 403 می‌گیرد؛ کاربر یا نقش خودکار ساخته نمی‌شود.",
         "requestBody": {
           "required": true,
-          "description": "فقط سه مقدار محتوایی؛ سایر خصوصیت‌ها از جمله requesterId و status باعث رد کل عملیات‌اند.",
+          "description": "فقط سه مقدار محتوایی؛ سایر خصوصیت‌ها از جمله requesterId و status باعث رد کل عملیات‌اند. سقف بدنهٔ خام ۱۳۱۰۷۲ بایت است؛ عبور از آن پیش از parsing و بررسی هویت/visibility با 413 عمومی رد می‌شود.",
           "content": {
             "application/json": {
               "schema": {
@@ -55,6 +55,9 @@
           "403": {
             "$ref": "#/components/responses/Response403_4"
           },
+          "413": {
+            "$ref": "#/components/responses/PayloadTooLarge"
+          },
           "500": {
             "$ref": "#/components/responses/Response500_5"
           },
@@ -71,7 +74,7 @@
         ],
         "operationId": "getChangeRequest",
         "summary": "مشاهدهٔ درخواست مجاز",
-        "description": "مالک در همهٔ وضعیت‌ها و Reviewer برای درخواست دیگران فقط در PendingReview؛ پاسخ منبع پنهان و ناموجود یکسان است.",
+        "description": "مالک در همهٔ وضعیت‌ها و Reviewer برای درخواست دیگران فقط در PendingReview؛ پاسخ منبع پنهان و ناموجود یکسان است. JWT معتبر بدون نگاشت محلی همان پاسخ عمومی 404 را می‌گیرد؛ شکست Database با نبود نگاشت یکی نیست.",
         "parameters": [
           {
             "name": "id",
@@ -111,7 +114,7 @@
         ],
         "operationId": "updateChangeRequest",
         "summary": "جایگزینی محتوای درخواست",
-        "description": "هر سه مقدار لازم‌اند؛ فقط مالک دارای مجوز Requester در Draft یا ChangesRequested. نوشتن مشروط به نسخهٔ مشاهده‌شده و تراکنش است.",
+        "description": "هر سه مقدار لازم‌اند؛ فقط مالک دارای مجوز Requester در Draft یا ChangesRequested. نوشتن مشروط به نسخهٔ مشاهده‌شده و تراکنش است. JWT معتبر بدون نگاشت محلی همان پاسخ عمومی 404 را می‌گیرد؛ شکست Database با نبود نگاشت یکی نیست.",
         "parameters": [
           {
             "name": "id",
@@ -136,7 +139,7 @@
         ],
         "requestBody": {
           "required": true,
-          "description": "فقط سه مقدار محتوایی؛ سایر خصوصیت‌ها از جمله requesterId و status باعث رد کل عملیات‌اند.",
+          "description": "فقط سه مقدار محتوایی؛ سایر خصوصیت‌ها از جمله requesterId و status باعث رد کل عملیات‌اند. سقف بدنهٔ خام ۱۳۱۰۷۲ بایت است؛ عبور از آن پیش از parsing و بررسی هویت/visibility با 413 عمومی رد می‌شود.",
           "content": {
             "application/json": {
               "schema": {
@@ -167,6 +170,9 @@
           "412": {
             "$ref": "#/components/responses/Response412_10"
           },
+          "413": {
+            "$ref": "#/components/responses/PayloadTooLarge"
+          },
           "428": {
             "$ref": "#/components/responses/Response428_11"
           },
@@ -186,7 +192,7 @@
         ],
         "operationId": "submitChangeRequest",
         "summary": "ارسال برای بررسی",
-        "description": "مالک دارای مجوز Requester؛ Draft یا ChangesRequested به PendingReview. تکرار روی PendingReview برای مالک وضعیت نامعتبر است.",
+        "description": "مالک دارای مجوز Requester؛ Draft یا ChangesRequested به PendingReview. تکرار روی PendingReview برای مالک وضعیت نامعتبر است. JWT معتبر بدون نگاشت محلی همان پاسخ عمومی 404 را می‌گیرد؛ شکست Database با نبود نگاشت یکی نیست.",
         "parameters": [
           {
             "name": "id",
@@ -211,7 +217,7 @@
         ],
         "requestBody": {
           "required": false,
-          "description": "بدون بدنه یا شیء JSON خالی؛ هر خصوصیت اضافی نامعتبر است.",
+          "description": "بدون بدنه یا شیء JSON خالی؛ هر خصوصیت اضافی نامعتبر است. سقف بدنهٔ خام ۱۳۱۰۷۲ بایت است؛ عبور از آن پیش از parsing و بررسی هویت/visibility با 413 عمومی رد می‌شود.",
           "content": {
             "application/json": {
               "schema": {
@@ -241,6 +247,9 @@
           },
           "412": {
             "$ref": "#/components/responses/Response412_10"
+          },
+          "413": {
+            "$ref": "#/components/responses/PayloadTooLarge"
           },
           "428": {
             "$ref": "#/components/responses/Response428_11"
@@ -261,7 +270,7 @@
         ],
         "operationId": "approveChangeRequest",
         "summary": "تأیید درخواست شخص دیگر",
-        "description": "Reviewer فعلی و غیرمالک؛ فقط PendingReview به Approved. پس از موفقیت، GET درخواست دیگران دیگر مجاز نیست.",
+        "description": "Reviewer فعلی و غیرمالک؛ فقط PendingReview به Approved. پس از موفقیت، GET درخواست دیگران دیگر مجاز نیست. JWT معتبر بدون نگاشت محلی همان پاسخ عمومی 404 را می‌گیرد؛ شکست Database با نبود نگاشت یکی نیست.",
         "parameters": [
           {
             "name": "id",
@@ -286,7 +295,7 @@
         ],
         "requestBody": {
           "required": false,
-          "description": "بدون بدنه یا شیء JSON خالی؛ هر خصوصیت اضافی نامعتبر است.",
+          "description": "بدون بدنه یا شیء JSON خالی؛ هر خصوصیت اضافی نامعتبر است. سقف بدنهٔ خام ۱۳۱۰۷۲ بایت است؛ عبور از آن پیش از parsing و بررسی هویت/visibility با 413 عمومی رد می‌شود.",
           "content": {
             "application/json": {
               "schema": {
@@ -316,6 +325,9 @@
           },
           "412": {
             "$ref": "#/components/responses/Response412_10"
+          },
+          "413": {
+            "$ref": "#/components/responses/PayloadTooLarge"
           },
           "428": {
             "$ref": "#/components/responses/Response428_11"
@@ -336,7 +348,7 @@
         ],
         "operationId": "requestChanges",
         "summary": "برگشت درخواست شخص دیگر برای اصلاح",
-        "description": "Reviewer فعلی و غیرمالک؛ فقط PendingReview به ChangesRequested. درخواست خود حتی با دو نقش قابل برگشت نیست.",
+        "description": "Reviewer فعلی و غیرمالک؛ فقط PendingReview به ChangesRequested. درخواست خود حتی با دو نقش قابل برگشت نیست. JWT معتبر بدون نگاشت محلی همان پاسخ عمومی 404 را می‌گیرد؛ شکست Database با نبود نگاشت یکی نیست.",
         "parameters": [
           {
             "name": "id",
@@ -361,7 +373,7 @@
         ],
         "requestBody": {
           "required": false,
-          "description": "بدون بدنه یا شیء JSON خالی؛ هر خصوصیت اضافی نامعتبر است.",
+          "description": "بدون بدنه یا شیء JSON خالی؛ هر خصوصیت اضافی نامعتبر است. سقف بدنهٔ خام ۱۳۱۰۷۲ بایت است؛ عبور از آن پیش از parsing و بررسی هویت/visibility با 413 عمومی رد می‌شود.",
           "content": {
             "application/json": {
               "schema": {
@@ -391,6 +403,9 @@
           },
           "412": {
             "$ref": "#/components/responses/Response412_10"
+          },
+          "413": {
+            "$ref": "#/components/responses/PayloadTooLarge"
           },
           "428": {
             "$ref": "#/components/responses/Response428_11"
@@ -417,7 +432,7 @@
     "schemas": {
       "WriteChangeRequest": {
         "type": "object",
-        "description": "متن سادهٔ well-formed Unicode؛ حدود پس از trim و بر حسب scalar سنجیده می‌شوند. تبدیل خودکار نوع و حذف بی‌صدای خصوصیت اضافی مجاز نیست.",
+        "description": "این Schema ساختار ورودی خام را توصیف می‌کند؛ پذیرش ساختاری آن کافی نیست. اعتبارسنجی معنایی باید متن سادهٔ well-formed Unicode، مقدار غیرخالی و حدود طول را پس از trim و بر حسب Unicode scalar بررسی و مقدار trim‌شده را ثبت کند؛ حدود بالای طول روی رشتهٔ خام اعمال نمی‌شوند. تبدیل خودکار نوع و حذف بی‌صدای خصوصیت اضافی مجاز نیست.",
         "additionalProperties": false,
         "required": [
           "title",
@@ -428,20 +443,17 @@
           "title": {
             "type": "string",
             "minLength": 1,
-            "maxLength": 200,
-            "description": "عنوان؛ پس از حذف فاصله‌های ابتدا و انتها، مقدار غیرخالی لازم است."
+            "description": "عنوان باید متن سادهٔ Unicode باشد. پس از حذف فاصله‌های ابتدا و انتها، طول آن باید بین ۱ تا ۲۰۰ Unicode scalar باشد و همان مقدار ثبت شود. این قاعده در اعتبارسنجی معنایی اعمال می‌شود؛ محدودیت طول روی رشتهٔ خام اعمال نمی‌شود."
           },
           "description": {
             "type": "string",
             "minLength": 1,
-            "maxLength": 5000,
-            "description": "شرح تغییر؛ متن ساده و بدون تفسیر HTML یا Markdown."
+            "description": "شرح تغییر باید متن سادهٔ Unicode و بدون تفسیر HTML یا Markdown باشد. پس از حذف فاصله‌های ابتدا و انتها، طول آن باید بین ۱ تا ۵۰۰۰ Unicode scalar باشد و همان مقدار ثبت شود. این قاعده در اعتبارسنجی معنایی اعمال می‌شود؛ محدودیت طول روی رشتهٔ خام اعمال نمی‌شود."
           },
           "reason": {
             "type": "string",
             "minLength": 1,
-            "maxLength": 2000,
-            "description": "دلیل تغییر؛ فارسی، لاتین، نیم‌فاصله و ایموجی مجازند."
+            "description": "دلیل تغییر باید متن سادهٔ Unicode باشد؛ فارسی، لاتین، نیم‌فاصله و ایموجی مجازند. پس از حذف فاصله‌های ابتدا و انتها، طول آن باید بین ۱ تا ۲۰۰۰ Unicode scalar باشد و همان مقدار ثبت شود. این قاعده در اعتبارسنجی معنایی اعمال می‌شود؛ محدودیت طول روی رشتهٔ خام اعمال نمی‌شود."
           }
         }
       },
@@ -537,7 +549,8 @@
               "CONCURRENCY_CONFLICT",
               "VERSION_REQUIRED",
               "SERVICE_UNAVAILABLE",
-              "INTERNAL_ERROR"
+              "INTERNAL_ERROR",
+              "PAYLOAD_TOO_LARGE"
             ],
             "description": "شناسهٔ فنی خطا"
           },
@@ -905,6 +918,50 @@
             "schema": {
               "type": "string",
               "const": "no-store"
+            }
+          }
+        }
+      },
+      "PayloadTooLarge": {
+        "description": "بدنهٔ خام بیش از ۱۳۱۰۷۲ بایت؛ پاسخ فنی پیش از parsing و بررسی هویت/visibility، مستقل از وجود منبع و اعتبار هویت و بدون تغییر داده؛ بدون errors، ETag یا Location.",
+        "headers": {
+          "Cache-Control": {
+            "description": "پاسخ نباید ذخیرهٔ موقت شود.",
+            "schema": {
+              "type": "string",
+              "const": "no-store"
+            }
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "code",
+                "category",
+                "message"
+              ],
+              "properties": {
+                "code": {
+                  "type": "string",
+                  "const": "PAYLOAD_TOO_LARGE"
+                },
+                "category": {
+                  "type": "string",
+                  "const": "خطای فنی"
+                },
+                "message": {
+                  "type": "string",
+                  "const": "حجم بدنهٔ درخواست بیش از حد مجاز است"
+                }
+              }
+            },
+            "example": {
+              "code": "PAYLOAD_TOO_LARGE",
+              "category": "خطای فنی",
+              "message": "حجم بدنهٔ درخواست بیش از حد مجاز است"
             }
           }
         }
