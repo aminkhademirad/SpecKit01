@@ -61,11 +61,10 @@ describe('US1؛ پذیرش HTTP با بررسی Database', () => {
     expect(context.fixture.requests.find(first.body.id)).toMatchObject({ ...valid, status: 'Draft' });
   });
 
-  it('AC-108؛ DELETE و PATCH و مسیرهای بررسی مراحل بعد وجود ندارند', async () => {
+  it('AC-108؛ DELETE و PATCH وجود ندارند', async () => {
     const before = snapshot(), row = context.fixture.records.owned.Draft;
     await request(server()).delete(`/api/change-requests/${row.id}`).set('Authorization', auth()).expect(404);
     await request(server()).patch(`/api/change-requests/${row.id}`).set('Authorization', auth()).send(valid).expect(404);
-    for (const action of ['approve', 'request-changes']) await request(server()).post(`/api/change-requests/${row.id}/${action}`).set('Authorization', auth()).send({}).expect(404);
     expect(snapshot()).toEqual(before);
   });
 

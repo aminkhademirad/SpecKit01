@@ -28,7 +28,8 @@ export function respondError(response: JsonResponse, error: DomainError): void {
   response.setHeader('Cache-Control', 'no-store');
   response.setHeader('Content-Type', 'application/json; charset=utf-8');
   if (status === 401) response.setHeader('WWW-Authenticate', 'Bearer');
-  const body: Record<string, unknown> = { code: error.code, category, message };
+  const publicMessage = error.code === 'FORBIDDEN' && error.reason === 'SELF_REVIEW' ? 'تأیید یا برگشت درخواست خودتان مجاز نیست.' : message;
+  const body: Record<string, unknown> = { code: error.code, category, message: publicMessage };
   if (error.code === 'INVALID_INPUT') body.errors = error.errors;
   if (error.code === 'VERSION_REQUIRED') body.errors = [{ field: 'If-Match', reason: 'نسخهٔ مشاهده‌شده الزامی است.' }];
   response.end(JSON.stringify(body));

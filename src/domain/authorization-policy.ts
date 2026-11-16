@@ -33,6 +33,7 @@ export function assertCanOperate(identity: Identity, user: User | null, request:
   assertCanView(identity, user, request);
   if (!user) throw new DomainError('REQUEST_UNAVAILABLE');
   const owner = user.id === request.requesterId;
+  if (owner && (operation === 'Approve' || operation === 'RequestChanges')) throw new DomainError('FORBIDDEN', [], 'SELF_REVIEW');
   const allowed = operation === 'Edit' || operation === 'Submit' ? owner && user.isRequester :
     (operation === 'Approve' || operation === 'RequestChanges') && !owner && user.isReviewer;
   if (!allowed) throw new DomainError('FORBIDDEN');

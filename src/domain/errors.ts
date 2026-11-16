@@ -5,7 +5,7 @@ export type ErrorCode = 'UNAUTHENTICATED' | 'REQUEST_UNAVAILABLE' | 'FORBIDDEN' 
 export interface FieldError { readonly field: string; readonly reason: string }
 
 export class DomainError extends Error {
-  constructor(readonly code: ErrorCode, readonly errors: readonly FieldError[] = []) {
+  constructor(readonly code: ErrorCode, readonly errors: readonly FieldError[] = [], readonly reason?: 'SELF_REVIEW') {
     super(code);
   }
 }

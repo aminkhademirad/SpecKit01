@@ -17,13 +17,16 @@ import { UpdateChangeRequest } from './application/update-change-request';
 import { ChangeRequestsController } from './http/controllers/change-requests.controller';
 import { SubmitChangeRequest } from './application/submit-change-request';
 import { SubmitChangeRequestController } from './http/controllers/submit-change-request.controller';
+import { ApproveChangeRequest } from './application/approve-change-request';
+import { RequestChanges } from './application/request-changes';
+import { ReviewChangeRequestController } from './http/controllers/review-change-request.controller';
 
 @Module({})
 export class AppModule {
   static forRoot(configuration: Configuration): DynamicModule {
     return {
       module: AppModule,
-      controllers: [ChangeRequestsController, SubmitChangeRequestController],
+      controllers: [ChangeRequestsController, SubmitChangeRequestController, ReviewChangeRequestController],
       providers: [
         { provide: SqliteDatabase, useFactory: () => {
           const database = new SqliteDatabase(configuration.databasePath);
@@ -40,10 +43,12 @@ export class AppModule {
         { provide: GetChangeRequest, useFactory: (visibility: RequestVisibility) => new GetChangeRequest(visibility), inject: [RequestVisibility] },
         { provide: UpdateChangeRequest, useFactory: (unit: SqliteUnitOfWork, users: SqliteUserStore, requests: SqliteChangeRequestStore) => new UpdateChangeRequest(unit, users, requests), inject: [SqliteUnitOfWork, SqliteUserStore, SqliteChangeRequestStore] },
         { provide: SubmitChangeRequest, useFactory: (unit: SqliteUnitOfWork, users: SqliteUserStore, requests: SqliteChangeRequestStore) => new SubmitChangeRequest(unit, users, requests), inject: [SqliteUnitOfWork, SqliteUserStore, SqliteChangeRequestStore] },
+        { provide: ApproveChangeRequest, useFactory: (unit: SqliteUnitOfWork, users: SqliteUserStore, requests: SqliteChangeRequestStore) => new ApproveChangeRequest(unit, users, requests), inject: [SqliteUnitOfWork, SqliteUserStore, SqliteChangeRequestStore] },
+        { provide: RequestChanges, useFactory: (unit: SqliteUnitOfWork, users: SqliteUserStore, requests: SqliteChangeRequestStore) => new RequestChanges(unit, users, requests), inject: [SqliteUnitOfWork, SqliteUserStore, SqliteChangeRequestStore] },
         { provide: APP_GUARD, useFactory: (jwt: JwtIdentity) => new AuthenticationGuard(jwt), inject: [JwtIdentity] },
         { provide: APP_GUARD, useFactory: (visibility: RequestVisibility) => new RequestVisibilityGuard(visibility), inject: [RequestVisibility] },
       ],
-      exports: [SqliteDatabase, SqliteUnitOfWork, SqliteUserStore, SqliteChangeRequestStore, JwtIdentity, ChangeUserPermissions, RequestVisibility, CreateChangeRequest, GetChangeRequest, UpdateChangeRequest, SubmitChangeRequest],
+      exports: [SqliteDatabase, SqliteUnitOfWork, SqliteUserStore, SqliteChangeRequestStore, JwtIdentity, ChangeUserPermissions, RequestVisibility, CreateChangeRequest, GetChangeRequest, UpdateChangeRequest, SubmitChangeRequest, ApproveChangeRequest, RequestChanges],
     };
   }
 }
