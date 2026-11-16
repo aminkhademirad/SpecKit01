@@ -10,9 +10,9 @@ description: "Taskهای اجرایی نسخهٔ اولیهٔ مدیریت در�
 [Research](research.md)، [مدل داده](data-model.md)، [قرارداد HTTP](contracts/http-api.md)،
 [OpenAPI](contracts/openapi.json)، [راهنمای اعتبارسنجی](quickstart.md) و [ماتریس پذیرش](validation.md).
 
-**وضعیت**: فازهای اول تا پنجم در T001 تا T044 با شواهد واقعی تکمیل شدند؛
-[گزارش آماده‌سازی](evidence/setup.md)، [گزارش زیرساخت](evidence/foundation.md)، [گزارش داستان اول](evidence/us1.md)، [گزارش داستان دوم](evidence/us2.md) و [گزارش داستان سوم](evidence/us3.md) نتایج اجرا را ثبت می‌کنند.
-T045 تا T064 انجام‌نشده‌اند؛ آغاز فاز ششم و هر فاز بعدی به تأیید صریح کاربر وابسته است.
+**وضعیت**: فازهای اول تا ششم در T001 تا T049 با شواهد واقعی تکمیل شدند؛
+[گزارش آماده‌سازی](evidence/setup.md)، [گزارش زیرساخت](evidence/foundation.md)، [گزارش داستان اول](evidence/us1.md)، [گزارش داستان دوم](evidence/us2.md)، [گزارش داستان سوم](evidence/us3.md) و [گزارش داستان چهارم](evidence/us4.md) نتایج اجرا را ثبت می‌کنند.
+T050 تا T064 انجام‌نشده‌اند؛ آغاز فاز هفتم و هر فاز بعدی به تأیید صریح کاربر وابسته است.
 
 **آزمون‌ها**: کاربر و قانون اساسی و Specification آزمون خودکار قواعد حیاتی، امنیت و Concurrency را الزام کرده‌اند؛
 به همین دلیل Task آزمون برای هر داستان و زیرساخت وجود دارد.
@@ -144,13 +144,13 @@ ORM، Login، مدیریت حساب، Endpoint نقش، حذف، لغو، Idempo
 
 ### آزمون‌های داستان ۴
 
-- [ ] T045 [P] [US4] نوشتن آزمون مستقل اصلاح و ارسال مجدد با ChangesRequested آماده: مالک/غیرمالک، ثابت‌ماندن id/مالک و وضعیت هنگام ویرایش، تمام قواعد ورودی/Unicode و رد فیلد سامانه؛ نیازی به اجرای RequestChanges در setup آزمون نباشد. مسیرها: `test/unit/us4-revision.spec.ts`؛ پیش‌نیاز: T044؛ ردیابی: FR-004، FR-010، FR-018، FR-022، FR-025، FR-026، AC-401، AC-402، AC-403، AC-405، AC-406، AC-407؛
-- [ ] T046 [P] [US4] نوشتن آزمون HTTP هفت سناریوی AC-401 تا AC-407 و چرخهٔ برگشت، ویرایش، GET نسخهٔ تازه، Submit مجدد و بررسی دوباره با Reviewer غیرمالک؛ 400 ورودی بدون تغییر جزئی و visibility جدید هر مرحله بررسی شود. مسیرها: `test/integration/us4-revision-http.spec.ts`؛ پیش‌نیاز: T044؛ ردیابی: FR-004، FR-007، FR-008، FR-010، FR-018، FR-022، FR-025، FR-026، AC-401، AC-402، AC-403، AC-404، AC-405، AC-406، AC-407؛
+- [X] T045 [P] [US4] نوشتن آزمون مستقل اصلاح و ارسال مجدد با ChangesRequested آماده: مالک/غیرمالک، ثابت‌ماندن id/مالک و وضعیت هنگام ویرایش، تمام قواعد ورودی/Unicode و رد فیلد سامانه؛ نیازی به اجرای RequestChanges در setup آزمون نباشد. مسیرها: `test/unit/us4-revision.spec.ts`؛ پیش‌نیاز: T044؛ ردیابی: FR-004، FR-010، FR-018، FR-022، FR-025، FR-026، AC-401، AC-402، AC-403، AC-405، AC-406، AC-407؛
+- [X] T046 [P] [US4] نوشتن آزمون HTTP هفت سناریوی AC-401 تا AC-407 و چرخهٔ برگشت، ویرایش، GET نسخهٔ تازه، Submit مجدد و بررسی دوباره با Reviewer غیرمالک؛ 400 ورودی بدون تغییر جزئی و visibility جدید هر مرحله بررسی شود. مسیرها: `test/integration/us4-revision-http.spec.ts`؛ پیش‌نیاز: T044؛ ردیابی: FR-004، FR-007، FR-008، FR-010، FR-018، FR-022، FR-025، FR-026، AC-401، AC-402، AC-403، AC-404، AC-405، AC-406، AC-407؛
 ### پیاده‌سازی و یکپارچه‌سازی داستان 4
 
-- [ ] T047 [P] [US4] گسترش کاربرد ویرایش T030 برای مالک دارای مجوز در ChangesRequested با همان اعتبارسنج T026 و نوشتن مشروط؛ status تا Submit همان ChangesRequested بماند، id/مالک حفظ و version تازه شود؛ ویرایش PendingReview/Approved همچنان ممنوع بماند. مسیرها: `src/application/update-change-request.ts`؛ پیش‌نیاز: T045، T046؛ ردیابی: FR-004، FR-006، FR-011، FR-018، FR-022، FR-025، FR-026، AC-401، AC-403، AC-405، AC-406، AC-407؛
-- [ ] T048 [P] [US4] گسترش Submit موجود برای ChangesRequested متعلق به Requester فعلی با همان بررسی جاری و If-Match؛ همان درخواست به PendingReview بازگردد و قواعد بررسی اولیه برقرار بمانند؛ منطق یا Endpoint ارسال مجدد موازی و متفاوت ساخته نشود. مسیرها: `src/application/submit-change-request.ts`؛ پیش‌نیاز: T045، T046؛ ردیابی: FR-010، FR-012، FR-013، FR-015، FR-018، AC-402، AC-403، AC-404؛
-- [ ] T049 [US4] اجرای آزمون مستقل fixture و چرخهٔ کامل US4 و آزمون‌های US1/US2 متاثر از گسترش فایل‌های مشترک؛ شواهد هفت سناریو، نسخه‌ها و مالک ثابت را ثبت و رگرسیون قواعد پیش‌نویس را بررسی کنید. مسیرها: `specs/001-change-request-management/evidence/us4.md`؛ پیش‌نیاز: T047، T048؛ ردیابی: FR-004، FR-010، FR-018، FR-022، FR-025، FR-026، AC-401، AC-402، AC-403، AC-404، AC-405، AC-406، AC-407؛
+- [X] T047 [P] [US4] گسترش کاربرد ویرایش T030 برای مالک دارای مجوز در ChangesRequested با همان اعتبارسنج T026 و نوشتن مشروط؛ status تا Submit همان ChangesRequested بماند، id/مالک حفظ و version تازه شود؛ ویرایش PendingReview/Approved همچنان ممنوع بماند. مسیرها: `src/application/update-change-request.ts`؛ پیش‌نیاز: T045، T046؛ ردیابی: FR-004، FR-006، FR-011، FR-018، FR-022، FR-025، FR-026، AC-401، AC-403، AC-405، AC-406، AC-407؛
+- [X] T048 [P] [US4] گسترش Submit موجود برای ChangesRequested متعلق به Requester فعلی با همان بررسی جاری و If-Match؛ همان درخواست به PendingReview بازگردد و قواعد بررسی اولیه برقرار بمانند؛ منطق یا Endpoint ارسال مجدد موازی و متفاوت ساخته نشود. مسیرها: `src/application/submit-change-request.ts`؛ پیش‌نیاز: T045، T046؛ ردیابی: FR-010، FR-012، FR-013، FR-015، FR-018، AC-402، AC-403، AC-404؛
+- [X] T049 [US4] اجرای آزمون مستقل fixture و چرخهٔ کامل US4 و آزمون‌های US1/US2 متاثر از گسترش فایل‌های مشترک؛ شواهد هفت سناریو، نسخه‌ها و مالک ثابت را ثبت و رگرسیون قواعد پیش‌نویس را بررسی کنید. مسیرها: `specs/001-change-request-management/evidence/us4.md`؛ پیش‌نیاز: T047، T048؛ ردیابی: FR-004، FR-010، FR-018، FR-022، FR-025، FR-026، AC-401، AC-402، AC-403، AC-404، AC-405، AC-406، AC-407؛
 
 **دروازه**: هفت سناریوی US4، حفظ id/مالک و عدم رگرسیون Draft و Submit اثبات شوند.
 

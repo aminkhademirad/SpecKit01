@@ -59,7 +59,7 @@ describe('US2؛ Application مستقل از HTTP با fixture واقعی SQLite'
     expect(read).not.toHaveBeenCalled(); expect(snapshot()).toEqual(committed);
   });
 
-  it.each(['PendingReview', 'Approved', 'ChangesRequested'] as const)('وضعیت %s پیش از ورودی و نسخه رد می‌شود', status => {
+  it.each(['PendingReview', 'Approved'] as const)('وضعیت %s پیش از ورودی و نسخه رد می‌شود', status => {
     const row = fixture.records.owned[status], before = snapshot(), read = jest.fn(() => { throw new Error('نباید خوانده شود.'); });
     expect(() => submit.execute(fixture.identity('requester-a'), row.id, read, read)).toThrow(expect.objectContaining({ code: 'INVALID_STATE' }));
     expect(read).not.toHaveBeenCalled(); expect(snapshot()).toEqual(before);

@@ -96,9 +96,11 @@ describe('US2؛ HTTP و قرارداد Submit با Database واقعی', () => {
     expect(snapshot()).toEqual(before);
   });
 
-  it('ارسال مجدد ChangesRequested برای فاز ششم باقی می‌ماند', async () => {
-    const row = context.fixture.records.owned.ChangesRequested, before = snapshot();
-    await request(server()).post(`/api/change-requests/${row.id}/submit`).set('Authorization', auth()).set('If-Match', encodeEtag(row)).send({}).expect(409);
-    expect(snapshot()).toEqual(before);
+  it('ارسال مجدد ChangesRequested از همان مسیر Submit انجام می‌شود', async () => {
+    const row = context.fixture.records.owned.ChangesRequested;
+    await request(server()).post(`/api/change-requests/${row.id}/submit`).set('Authorization', auth()).set('If-Match', encodeEtag(row)).send({}).expect(204);
+    const after = context.fixture.requests.find(row.id)!;
+    expect(after).toEqual({ ...row, status: 'PendingReview', version: expect.any(String) });
+    expect(after.version).not.toBe(row.version);
   });
 });

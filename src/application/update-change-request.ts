@@ -16,7 +16,7 @@ export class UpdateChangeRequest {
       const user = this.users.find(identity.issuer, identity.subject);
       const current = this.requests.find(id);
       assertCanOperate(identity, user, current, 'Edit');
-      if (current!.status !== 'Draft') throw new DomainError('INVALID_STATE');
+      if (current!.status !== 'Draft' && current!.status !== 'ChangesRequested') throw new DomainError('INVALID_STATE');
       const content = validateChangeRequestContent(readContent());
       const expected = readVersion();
       if (expected.id !== current!.id || expected.version !== current!.version) throw new DomainError('CONCURRENCY_CONFLICT');

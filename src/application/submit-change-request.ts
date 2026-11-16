@@ -14,7 +14,7 @@ export class SubmitChangeRequest {
       const user = this.users.find(identity.issuer, identity.subject);
       const current = this.requests.find(id);
       assertCanOperate(identity, user, current, 'Submit');
-      if (current!.status !== 'Draft') throw new DomainError('INVALID_STATE');
+      if (current!.status !== 'Draft' && current!.status !== 'ChangesRequested') throw new DomainError('INVALID_STATE');
       const body = readBody();
       if (body !== undefined && (typeof body !== 'object' || body === null || Array.isArray(body))) {
         throw invalidInput('body', 'بدنه باید غایب یا شیء JSON خالی باشد.');

@@ -102,9 +102,9 @@ describe('US1؛ پذیرش HTTP با بررسی Database', () => {
     }
   });
 
-  it('ویرایش وضعیت غیر Draft و نسخهٔ قدیمی یا غایب رد می‌شود', async () => {
+  it('ویرایش PendingReview و Approved و نسخهٔ قدیمی یا غایب رد می‌شود', async () => {
     const before = snapshot();
-    for (const status of ['PendingReview', 'Approved', 'ChangesRequested'] as const) {
+    for (const status of ['PendingReview', 'Approved'] as const) {
       const row = context.fixture.records.owned[status];
       await request(server()).put(`/api/change-requests/${row.id}`).set('Authorization', auth()).set('Content-Type', 'application/json').send('{').expect(409);
     }
