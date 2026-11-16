@@ -4,7 +4,10 @@
   "private": true,
   "description": "سامانهٔ مدیریت درخواست تغییر؛ نسخهٔ اولیه",
   "type": "commonjs",
-  "engines": { "node": ">=24.15.0 <25", "npm": ">=11.16.0" },
+  "engines": {
+    "node": ">=24.15.0 <25",
+    "npm": ">=11.16.0"
+  },
   "packageManager": "npm@11.16.0",
   "allowScripts": {
     "better-sqlite3@13.2.0": false,
@@ -43,6 +46,7 @@
     "@types/jest": "^30.0.0",
     "@types/node": "^24.0.0",
     "@types/supertest": "^6.0.0",
+    "ajv": "8.20.0",
     "jest": "30.5.2",
     "supertest": "7.3.2",
     "ts-jest": "29.4.15",

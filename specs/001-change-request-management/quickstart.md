@@ -1,134 +1,85 @@
-# راهنمای اعتبارسنجی ChangeFlow پس از پیاده‌سازی
+# راهنمای عملی اجرای ChangeFlow
 
-**وضعیت**: راهنمای اجرای آینده؛ در مرحلهٔ Plan هیچ package.json، اسکریپت، برنامه، Migration یا تستی ساخته نشده است.
-دستورهای زیر قرارداد مورد انتظار برای مرحلهٔ پیاده‌سازی‌اند و اکنون قابل اجرا بودن یا موفقیت آن‌ها ادعا نمی‌شود.
+**تاریخ**: 2026-11-17 | **محدوده**: Development/Test روی یک میزبان محلی
 
-**مراجع**: [برنامه](plan.md)، [مدل داده](data-model.md)، [قرارداد HTTP](contracts/http-api.md)،
-[OpenAPI](contracts/openapi.json)، [Specification](spec.md).
+مراحل نصب، تنظیمات، Migration و کاربران نمونه در [README](../../README.md) آمده‌اند. قبل از درخواست HTTP، برنامه باید با npm.cmd start در نشست دیگری اجرا شود. این راهنما نیازمند Frontend نیست.
 
-## پیش‌نیازهای اجرای آینده
+## ایجاد، اصلاح و ارسال
 
-- Node.js از خط پشتیبانی‌شدهٔ 24.x با حداقل 24.15 برای ابزارهای NestJS 12؛ Patch نگهداری‌شدهٔ خط منتخب نصب شود.
-- npm و وابستگی‌های تثبیت‌شده در package-lock.json مرحلهٔ پیاده‌سازی؛ نصب باید Native Driver را نیز واقعاً بارگذاری کند.
-- فایل SQLite روی دیسک محلی با دسترسی نوشتن؛ بدون Database شبکه‌ای، Docker یا سرویس خارجی برای سناریوی محلی.
-- محیط Development/Test؛ کلید امضای محلی خارج از مخزن و توکن‌های آزمایشی کوتاه‌عمر.
-- نمونه‌های اولیهٔ کاربران در Database و issuer/audience یکسان میان ابزار توکن و برنامه.
-
-در بررسی این محیط، Node.js برابر v24.18.0 و npm برابر 11.16.0 گزارش شدند؛ pnpm در PATH یافت نشد.
-هیچ بسته‌ای نصب نشده و سازگاری Native Driver، Build، Migration یا تست هنوز بررسی اجرایی نشده است.
-
-## قرارداد دستورها و آماده‌سازی
-
-پس از ایجاد کد و package-lock.json در مرحلهٔ پیاده‌سازی، از ریشهٔ مخزن:
+در PowerShell، از ریشهٔ مخزن و بدون چاپ توکن‌ها:
 
 ```powershell
-node --version
-npm --version
-npm ci
-npm run dev:init
-npm run db:migrate
-npm run dev:seed
-npm run build
+$baseUrl = 'http://127.0.0.1:3000'
+$requesterToken = (npm.cmd run --silent dev:token -- --subject requester-a).Trim()
+$reviewerToken = (npm.cmd run --silent dev:token -- --subject reviewer-b).Trim()
+$requesterHeaders = @{ Authorization = "Bearer $requesterToken" }
+$reviewerHeaders = @{ Authorization = "Bearer $reviewerToken" }
+$content = @{ title = 'اصلاح فرایند انتشار'; description = 'افزودن بررسی پیش از انتشار'; reason = 'کاهش خطاهای انتشار' }
+$payload = [Text.Encoding]::UTF8.GetBytes(($content | ConvertTo-Json -Compress))
+$created = Invoke-WebRequest -UseBasicParsing -Method Post -Uri "$baseUrl/api/change-requests" -Headers $requesterHeaders -ContentType 'application/json; charset=utf-8' -Body $payload
+$change = $created.Content | ConvertFrom-Json
+$requestUrl = "$baseUrl/api/change-requests/$($change.id)"
+$ownerView = Invoke-WebRequest -UseBasicParsing -Uri $requestUrl -Headers $requesterHeaders
+$writeHeaders = @{ Authorization = "Bearer $requesterToken"; 'If-Match' = $ownerView.Headers['ETag'] }
+$edited = Invoke-WebRequest -UseBasicParsing -Method Put -Uri $requestUrl -Headers $writeHeaders -ContentType 'application/json; charset=utf-8' -Body $payload
+$submitHeaders = @{ Authorization = "Bearer $requesterToken"; 'If-Match' = $edited.Headers['ETag'] }
+Invoke-WebRequest -UseBasicParsing -Method Post -Uri "$requestUrl/submit" -Headers $submitHeaders -ContentType 'application/json' -Body '{}'
 ```
 
-| دستور آینده | مسئولیت و نتیجهٔ مورد انتظار |
-| --- | --- |
-| dev:init | آماده‌کردن تنظیمات محلی و کلید تصادفی خارج از Git؛ بازنویسی خودکار کلید موجود انجام نشود و کلید در خروجی عمومی چاپ نشود. |
-| db:migrate | اجرای Migrationهای ترتیبی و تراکنشی روی مسیر DATABASE_PATH؛ ثبت شماره و checksum؛ بدون reset داده. |
-| dev:seed | provision تکرارپذیر کاربران نمونه در محیط Development/Test؛ بدون حذف درخواست‌های موجود. |
-| build | کامپایل TypeScript و خروج غیرصفر در شکست؛ بدون اعلام موفقیت فرضی. |
-| dev:token | تولید JWT امضاشده برای subject نمونه؛ بدون Endpoint صدور توکن در API. |
-| dev:permissions | ابزار داخلی Development/Test برای تغییر مجوز از همان تراکنش IMMEDIATE؛ API عمومی مدیریت نقش نیست. |
+نتیجهٔ ایجاد 201 و Draft است؛ اصلاح 200 و ETag تازه می‌دهد و ارسال 204 دارد. شناسه و مالک در اصلاح و انتقال ثابت می‌مانند. ارسال موفق را با GET مالک بررسی کنید؛ ETag پاسخ قدیمی برای نوشتن بعدی معتبر نیست.
 
-متغیرهای مورد انتظار تنظیمات عبارت‌اند از NODE_ENV، PORT، DATABASE_PATH، JWT_ISSUER، JWT_AUDIENCE و JWT_SECRET.
-مقادیر محلی issuer و audience طبق قرارداد به‌ترتیب changeflow-dev و changeflow-api هستند.
-JWT_SECRET باید با ابزار dev:init به‌طور تصادفی تولید و در فایل محلی نادیده‌گرفته‌شده توسط Git نگهداری شود؛
-مقدار ثابت داخل مستندات یا مخزن قرار نمی‌گیرد. برنامه برای حالت production نباید همین راهبرد نمایشی را بی‌تنظیم مستقل فعال کند.
+## بررسی، برگشت و ارسال مجدد
 
-نمونه‌های provision مورد نیاز:
+```powershell
+$reviewView = Invoke-WebRequest -UseBasicParsing -Uri $requestUrl -Headers $reviewerHeaders
+$decisionHeaders = @{ Authorization = "Bearer $reviewerToken"; 'If-Match' = $reviewView.Headers['ETag'] }
+Invoke-WebRequest -UseBasicParsing -Method Post -Uri "$requestUrl/request-changes" -Headers $decisionHeaders -ContentType 'application/json' -Body '{}'
+$returned = Invoke-WebRequest -UseBasicParsing -Uri $requestUrl -Headers $requesterHeaders
+$revisionHeaders = @{ Authorization = "Bearer $requesterToken"; 'If-Match' = $returned.Headers['ETag'] }
+$content.description = 'افزودن بررسی و آزمون پیش از انتشار'
+$payload = [Text.Encoding]::UTF8.GetBytes(($content | ConvertTo-Json -Compress))
+$revision = Invoke-WebRequest -UseBasicParsing -Method Put -Uri $requestUrl -Headers $revisionHeaders -ContentType 'application/json; charset=utf-8' -Body $payload
+$fresh = Invoke-WebRequest -UseBasicParsing -Uri $requestUrl -Headers $requesterHeaders
+$resubmitHeaders = @{ Authorization = "Bearer $requesterToken"; 'If-Match' = $fresh.Headers['ETag'] }
+Invoke-WebRequest -UseBasicParsing -Method Post -Uri "$requestUrl/submit" -Headers $resubmitHeaders -ContentType 'application/json' -Body '{}'
+$reviewAgain = Invoke-WebRequest -UseBasicParsing -Uri $requestUrl -Headers $reviewerHeaders
+$approveHeaders = @{ Authorization = "Bearer $reviewerToken"; 'If-Match' = $reviewAgain.Headers['ETag'] }
+Invoke-WebRequest -UseBasicParsing -Method Post -Uri "$requestUrl/approve" -Headers $approveHeaders -ContentType 'application/json' -Body '{}'
+$finalView = Invoke-WebRequest -UseBasicParsing -Uri $requestUrl -Headers $requesterHeaders
+$finalView.Content
+```
 
-| subject | نقش اولیه | کاربرد |
+پس از برگشت، وضعیت ChangesRequested و مشاهدهٔ Reviewer ممنوع است. اصلاح وضعیت را تغییر نمی‌دهد؛ ارسال مجدد PendingReview و بررسی نهایی Approved می‌سازند. پس از هر تصمیم Reviewer دوباره دسترسی مشاهده ندارد؛ پاسخ GET او 404 عمومی است. Approved قابل اصلاح یا انتقال خروجی نیست.
+
+## بازبینی خطاها و نتیجهٔ عملیات
+
+PowerShell برای پاسخ ناموفق خطا ایجاد می‌کند؛ کد HTTP و بدنهٔ فارسی باید از پاسخ خطا خوانده شوند. این خطا به معنی پذیرفته‌شدن عملیات نیست. برای آزمون دستی باید از درخواست نمونهٔ آزمایشی استفاده شود.
+
+| نقش | آزمون | نتیجهٔ مورد انتظار |
 | --- | --- | --- |
-| requester-a | Requester | ایجاد و مالکیت |
-| reviewer-b | Reviewer | بررسی درخواست دیگران |
-| dual-c | Requester و Reviewer | اثبات منع Approve و RequestChanges روی درخواست خود |
-| reviewer-d | Reviewer | رقابت دو تصمیم |
+| Requester | ایجاد، اصلاح Draft، ارسال، اصلاح ChangesRequested و ارسال مجدد | وضعیت و داده مطابق گردش بالا؛ حفظ شناسه و مالک |
+| Requester | ویرایش PendingReview یا Approved و Submit تکراری | 409؛ بدون تغییر |
+| Requester | ویرایش با ETag پیش از آخرین اصلاح | 412؛ دادهٔ تازه باقی بماند |
+| Requester | نبود If-Match، فیلد اضافی، متن نامعتبر | 428 یا 400 همراه نام فیلد؛ بدون تغییر جزئی |
+| Reviewer | مشاهده و تصمیم روی PendingReview دیگران | 200 و سپس 204؛ وضعیت تازه را مالک ببیند |
+| Reviewer | مشاهدهٔ دیگران در سه وضعیت دیگر یا تصمیم تکراری | 404 یکسان با شناسهٔ ناموجود |
+| Reviewer | تصمیم با نسخهٔ چرخهٔ قبلی، پس از بازگشت همان درخواست به PendingReview | 412؛ تصمیمی ثبت نشود |
+| هر دو نقش | Approve یا RequestChanges روی درخواست خود | 403 با توضیح فارسی؛ بدون تغییر |
+| هر نقش | توکن نامعتبر/منقضی یا مجوز جاری لغوشده | رد عملیات؛ نقش توکن یا مشاهدهٔ قبلی کافی نیست |
 
-تولید توکن و اجرای برنامه در دو نشست محلی آینده:
+برای SC-007 نمایندهٔ هر نقش باید نتایج سناریوهای مرتبط را واقعاً مشاهده و وضعیت، موفقیت، رد یا تعارض را تشخیص دهد. اجرای خودکار یا تأیید کلی کدنویسی جای این مشاهده را نمی‌گیرد. نتیجه و استثناها باید در [گزارش پذیرش](evidence/acceptance.md) ثبت شوند.
 
-```powershell
-npm run dev:token -- --subject requester-a
-npm run dev:token -- --subject reviewer-b
-npm run dev:token -- --subject dual-c
-npm run dev:token -- --subject reviewer-d
-npm run start:dev
-```
-
-نشانی برنامه‌ریزی‌شده http://localhost:3000 است. توکن هر کاربر فقط هویت او را ثابت می‌کند؛
-تعویض role claim برای تغییر مجوز کافی نیست. ابزار dev:permissions باید مقدار فعلی Database را از مسیر کنترل‌شده تغییر دهد.
-
-## مسیرهای اعتبارسنجی سرتاسری
-
-برای درخواست‌های تغییر، نسخهٔ ETag دریافت‌شده را عیناً در If-Match نگه دارید.
-مقادیر نمونهٔ title، description و reason می‌توانند به‌ترتیب «اصلاح فرایند انتشار»،
-«افزودن بررسی پیش از انتشار» و «کاهش خطاهای انتشار» باشند.
-
-| سناریو | اجرا در نسخهٔ پیاده‌سازی‌شده | نتیجهٔ مورد انتظار |
-| --- | --- | --- |
-| مسیر تأیید | requester-a ایجاد کند؛ با ETag ارسال کند؛ reviewer-b آن را دریافت و تأیید کند. | Draft، سپس PendingReview و در نهایت Approved؛ انتقال‌ها 204؛ مالک نسخهٔ نهایی را می‌بیند. |
-| مسیر اصلاح | reviewer-b درخواست PendingReview شخص دیگر را برگرداند؛ مالک اصلاح و دوباره ارسال کند. | ChangesRequested، حفظ id و مالک، و بازگشت به PendingReview؛ Reviewer پس از برگشت GET مجاز ندارد. |
-| دو نقش و درخواست خود | dual-c ایجاد و ارسال کند و سپس Approve و RequestChanges روی همان درخواست بخواهد. | هر دو با 403 رد و درخواست بدون تغییر بماند؛ داشتن دو نقش استثنا نیست. |
-| مالکیت | کاربر غیرمالک ویرایش یا Submit درخواست دیگری را بخواهد. | اگر قابل مشاهده نیست 404 عمومی؛ اگر قابل مشاهده ولی عملیات ممنوع است 403؛ بدون تغییر. |
-| تغییرناپذیری | مالک Approved را ویرایش یا دوباره Submit کند. | تغییر رد شود؛ Approved و محتوا ثابت بمانند. |
-| ایجاد تکراری | requester-a همان ورودی معتبر را دو بار ایجاد کند. | دو درخواست مستقل در Draft؛ جلوگیری از تکرار در MVP وجود ندارد. |
-| Submit تکراری | مالک پس از ارسال موفق و ماندن در PendingReview دوباره Submit کند. | خطای وضعیت 409؛ نه موفقیت قبلی و نه تغییر اضافی. |
-| ورودی تحت کنترل سامانه | requesterId یا status حتی با مقدار درست در ایجاد یا ویرایش ارسال شود. | 400 با نام فیلد و علت فارسی؛ کل عملیات رد شود. |
-| حدود متن | طول‌های حداقل، حداکثر و یک scalar بیشتر از سقف و متن فقط فاصله بررسی شوند. | حدود معتبر پذیرفته؛ موارد نامعتبر رد؛ trim قبل از شمارش؛ نیم‌فاصله حفظ شود. |
-| متن Unicode | فارسی، لاتین، ایموجی ساده و مرکب و متن شامل HTML/Markdown ارسال و دریافت شوند. | متن ساده حفظ شود؛ شمارش scalar؛ عدم تفسیر و عدم تبدیل بی‌صدا. |
-| توکن نامعتبر | امضای نامعتبر، issuer/audience متفاوت، انقضا و sub غایب امتحان شوند. | 401 فارسی؛ بدون اطلاعات درخواست. |
-| محرمانگی جفتی | یک id ناموجود و یک id خارج از مشاهده، با بدنه یا If-Match معتبر و نامعتبر امتحان شوند. | در همهٔ عملیات وابسته به id، پاسخ عمومی یکسان 404 و بدون ETag یا جزئیات منبع. |
-
-هیچ Endpoint حذف، لغو، Login یا مدیریت نقش در فهرست قرارداد نباید موجود باشد.
-آزمون‌های HTTP باید از bootstrap واقعی با همان Guards، parsing، Pipes و Filters استفاده کنند؛
-پیکربندی مخصوص تست نباید ترتیب بررسی‌های امنیتی را آسان‌تر از برنامه کند.
-
-## آزمون Concurrency واقعی
-
-دستورهای برنامه‌ریزی‌شده پس از پیاده‌سازی:
+## اجرای آزمون‌های واقعی
 
 ```powershell
-npm run test:unit
-npm run test:integration
-npm run test:concurrency
-npm run test:contract
+npm.cmd run build
+npm.cmd run typecheck
+npm.cmd run test:unit
+npm.cmd run test:integration
+npm.cmd run test:concurrency
+npm.cmd run test:contract
 ```
 
-آزمون‌های Database باید Migration واقعی و فایل موقت مختص هر سناریو داشته باشند.
-دو writer باید اتصال مستقل و برای رقابت واقعی better-sqlite3، worker یا process مستقل داشته باشند؛
-Promise.all روی دو callback همگام در یک event loop اثبات رقابت SQLite نیست.
-Coordinator آزمون باید مستقل از event loop مسدودشده توالی را کنترل کند؛ sleep تصادفی ملاک ترتیب نیست.
+Integration ابزارهای CLI و Database واقعی را نیز بررسی می‌کند. Concurrency از worker و اتصال مستقل استفاده می‌کند؛ Coordinator بدون sleep تصادفی ترتیب را کنترل می‌کند. Contract شامل تطبیق OpenAPI و مرز ۱۳۱۰۷۲ بایت است. خروجی‌های محلی test-results در Git نگهداری نمی‌شوند؛ گزارش‌های evidence نتایج واقعی و محدودیت‌ها را ثبت می‌کنند.
 
-| سناریو | ترتیب کنترل‌شده و نتیجهٔ قابل اثبات |
-| --- | --- |
-| دو ویرایش Draft | هر دو نسخهٔ مشترک را ببینند؛ تغییر اول Commit شود؛ دومی با نسخهٔ قدیمی رد شود؛ دادهٔ اول باقی بماند. |
-| دو ویرایش ChangesRequested | همان رقابت و همان تضمین بدون Lost Update. |
-| دو تصمیم متناقض | از PendingReview مشترک، فقط یک انتقال نهایی شود؛ عملیات دیگر رد یا متعارض باشد و محرمانگی جاری را رعایت کند. |
-| ویرایش همراه Submit | نتیجه با یک ترتیب معتبر سازگار باشد؛ پس از Submit موفق، ویرایش قدیمی محتوا را عوض نکند. |
-| لغو زودتر | لغو مجوز با اتصال مستقل Commit شود، سپس تصمیم ادامه یابد؛ تصمیم رد و هیچ تغییر ناشی از آن اعمال نشود. |
-| تصمیم زودتر | تصمیم با مجوز معتبر Commit شود، سپس لغو؛ تصمیم باطل نشود و وضعیت بازنویسی نشود. |
-| اشغال واقعی Database | اتصال مستقل قفل نوشتن بگیرد؛ مهلت انتظار عملیات دیگر پایان یابد؛ 503 بدون موفقیت کاذب یا تغییر جزئی؛ اشغال، stale version نامیده نشود. |
-| Rollback | خطای کنترل‌شده پیش از Commit تزریق شود؛ دادهٔ درخواست و version قدیمی باقی بمانند. |
-
-callback تراکنش IMMEDIATE باید کاملاً همگام باشد؛ await، شبکه یا انتظار متکی به همان event loop در آن مجاز نیست.
-هم‌زمانی چند worker در تست فقط ابزار اثبات است و به معنی تأیید استقرار چندمیزبانی MVP نیست.
-
-## ثبت شواهد و پذیرش
-
-گزارش آینده برای هر فرمان باید زمان اجرا، فرمان، نسخهٔ وابستگی، exit code و مسیر خروجی آزمون را ثبت کند.
-برای Concurrency، ترتیب Commit، نتیجهٔ هر اقدام و محتوا/وضعیت/version نهایی نیز ثبت شوند؛
-JWT و کلید امضا نباید در گزارش اشتراک‌گذاری‌شده قرار گیرند.
-
-ردیابی کامل ۵۳ سناریو و ۲۷ نیازمندی در [ماتریس اعتبارسنجی](validation.md) آمده است.
-موفقیت Build و Test شرط لازم است؛ پذیرش نهایی نیازمند انطباق معماری، امنیت، قواعد محصول و
-معیارهای SC-001 تا SC-015 و مشاهدهٔ واقعی نتیجه است. اجرا‌نشده، مسدود یا شکست‌خورده باید همان‌گونه گزارش شود.
-در پایان این مرحلهٔ Plan، هیچ نتیجهٔ اجرایی از این راهنما تأیید نشده است.
+هویت محلی جای راهکار هویت عملیاتی سازمان نیست. نسخهٔ فعلی production، استقرار چندمیزبانی، Frontend و AI را پوشش نمی‌دهد. خطای فنی یا نتیجهٔ نامعلوم نباید باعث ساخت خودکار درخواست جایگزین شود. جزئیات خطاها و رفع مشکل در README و قرارداد HTTP آمده است.
